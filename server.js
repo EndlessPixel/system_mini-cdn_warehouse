@@ -1,4 +1,3 @@
-// 获取页面元素
 const statusElement = document.getElementById('serverStatus');
 const playerCountElement = document.getElementById('playerCount');
 const refreshButton = document.getElementById('refreshStatus');
@@ -10,13 +9,16 @@ const loading = document.getElementById('loading');
 const error = document.getElementById('error');
 const refreshStatusbar = document.getElementById('refreshStatusbar');
 const pingElement = document.getElementById('ping');
-const nodeApiUrls = {gz: 'https://api.mcsrvstat.us/3/gz.endlesspixel.fun:21212',hn: 'https://api.mcsrvstat.us/3/hn.endlesspixel.fun:25568',hb: 'https://api.mcsrvstat.us/3/hb.endlesspixel.fun:25568'};
-const nodeFrpUrls = {gz: 'https://api.mcsrvstat.us/3/vip.gz.frp.one:21212',hn: 'https://api.mcsrvstat.us/3/ld.frp.one:25568',hb: 'https://api.mcsrvstat.us/3/hb.frp.one:25568'};
-function getCurrentApiUrl() {const selectedNode = nodeSelect.value;const connectionOption = getSelectedConnectionOption();if (connectionOption === 'domain') {
-return nodeApiUrls[selectedNode];} else if (connectionOption === 'frp') {
-return nodeFrpUrls[selectedNode];
+const nodeApiUrls = { gz: 'https://api.mcsrvstat.us/3/gz.endlesspixel.fun:21212', hn: 'https://api.mcsrvstat.us/3/hn.endlesspixel.fun:25568', hb: 'https://api.mcsrvstat.us/3/hb.endlesspixel.fun:25568' };
+const nodeFrpUrls = { gz: 'https://api.mcsrvstat.us/3/vip.gz.frp.one:21212', hn: 'https://api.mcsrvstat.us/3/ld.frp.one:25568', hb: 'https://api.mcsrvstat.us/3/hb.frp.one:25568' };
+function getCurrentApiUrl() {
+    const selectedNode = nodeSelect.value; const connectionOption = getSelectedConnectionOption(); if (connectionOption === 'domain') {
+        return nodeApiUrls[selectedNode];
+    } else if (connectionOption === 'frp') {
+        return nodeFrpUrls[selectedNode];
     }
 }
+
 // 获取单选框的值
 function getSelectedConnectionOption() {
     const radios = document.getElementsByName('connectionOption');
@@ -40,26 +42,29 @@ async function fetchServerStatus() {
         refreshStatusbar.style.display = 'block';
         refreshStatusbar.style.width = '0%';
         // 发起请求获取服务器状态
-        const response = await fetch(API_URL, { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-// 获取服务器状态
-async function fetchServerStatus() {
-    try {
-        const API_URL = getCurrentApiUrl();
-        statusElement.textContent = '查询中...';
-        statusElement.style.color = '#f39c12';
-        playerCountElement.textContent = '...';
-        motdElement.textContent = '查询中...';
-        apiVersionElement.textContent = '查询中...';
-        // 显示刷新状态条
-        refreshStatusbar.style.display = 'block';
-        refreshStatusbar.style.width = '0%';
-        // 发起请求获取服务器状态
-        const response = await fetch(API_URL, { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        
+        // 保留这个带有超时处理的请求
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('请求超时')), 10000)
+        );
+        
+        const fetchPromise = fetch(API_URL, { cache: 'no-store' });
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+        // 添加重试机制
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                const response = await fetch(API_URL, { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                break;
+            } catch (error) {
+                retries--;
+                if (retries === 0) throw error;
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
         }
         // 解析响应数据
         const data = await response.json();
@@ -96,7 +101,8 @@ async function fetchServerStatus() {
 
     } catch (error) {
         console.error('Error fetching server status:', error);
-        statusElement.textContent = '无法获取';
+        // 添加更详细的错误信息
+        statusElement.textContent = `无法获取 (${error.message})`;
         statusElement.style.color = '#e74c3c';
         playerCountElement.textContent = '错误';
         motdElement.textContent = '错误';
