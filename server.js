@@ -14,8 +14,36 @@ const nodeApiUrls = {gz: 'https://api.mcsrvstat.us/3/gz.endlesspixel.fun:21212',
 const nodeFrpUrls = {gz: 'https://api.mcsrvstat.us/3/vip.gz.frp.one:21212',hn: 'https://api.mcsrvstat.us/3/ld.frp.one:25568',hb: 'https://api.mcsrvstat.us/3/hb.frp.one:25568'};
 function getCurrentApiUrl() {const selectedNode = nodeSelect.value;const connectionOption = getSelectedConnectionOption();if (connectionOption === 'domain') {
 return nodeApiUrls[selectedNode];} else if (connectionOption === 'frp') {
-return nodeFrpUrls[selectedNode];}}
-function getSelectedConnectionOption() {const radios = document.getElementsByName('connectionOption');for (let i = 0; i < radios.length; i++) {if (radios[i].checked) {return radios[i].value;}}return 'domain';
+return nodeFrpUrls[selectedNode];
+    }
+}
+// 获取单选框的值
+function getSelectedConnectionOption() {
+    const radios = document.getElementsByName('connectionOption');
+    for (let i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            return radios[i].value;
+        }
+    }
+    return 'domain'; // 默认值
+}
+// 获取服务器状态
+async function fetchServerStatus() {
+    try {
+        const API_URL = getCurrentApiUrl();
+        statusElement.textContent = '查询中...';
+        statusElement.style.color = '#f39c12';
+        playerCountElement.textContent = '...';
+        motdElement.textContent = '查询中...';
+        apiVersionElement.textContent = '查询中...';
+        // 显示刷新状态条
+        refreshStatusbar.style.display = 'block';
+        refreshStatusbar.style.width = '0%';
+        // 发起请求获取服务器状态
+        const response = await fetch(API_URL, { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 // 获取服务器状态
 async function fetchServerStatus() {
     try {
