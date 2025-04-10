@@ -9,8 +9,8 @@ const loading = document.getElementById('loading');
 const error = document.getElementById('error');
 const refreshStatusbar = document.getElementById('refreshStatusbar');
 const pingElement = document.getElementById('ping');
-const nodeApiUrls = { gz: 'https://api.mcsrvstat.us/3/gz.endlesspixel.fun:21212', hn: 'https://api.mcsrvstat.us/3/hn.endlesspixel.fun:25568', hb: 'https://api.mcsrvstat.us/3/hb.endlesspixel.fun:25568' };
-const nodeFrpUrls = { gz: 'https://api.mcsrvstat.us/3/vip.gz.frp.one:21212', hn: 'https://api.mcsrvstat.us/3/ld.frp.one:25568', hb: 'https://api.mcsrvstat.us/3/hb.frp.one:25568' };
+const nodeApiUrls = { zj: 'https://api.mcsrvstat.us/3/zj.endlesspixel.fun:25555', gz: 'https://api.mcsrvstat.us/3/gz.endlesspixel.fun:21212', hn: 'https://api.mcsrvstat.us/3/hn.endlesspixel.fun:25568', hb: 'https://api.mcsrvstat.us/3/hb.endlesspixel.fun:25568' };
+const nodeFrpUrls = { zj: 'https://api.mcsrvstat.us/3/mc.ingemar.cyou:25555', gz: 'https://api.mcsrvstat.us/3/vip.gz.frp.one:21212', hn: 'https://api.mcsrvstat.us/3/ld.frp.one:25568', hb: 'https://api.mcsrvstat.us/3/hb.frp.one:25568' };
 function getCurrentApiUrl() {
     const selectedNode = nodeSelect.value; const connectionOption = getSelectedConnectionOption(); if (connectionOption === 'domain') {
         return nodeApiUrls[selectedNode];
