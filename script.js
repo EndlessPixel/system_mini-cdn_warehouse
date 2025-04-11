@@ -196,3 +196,36 @@ document.addEventListener('DOMContentLoaded', () => {
     initFeatures();
     initTimer();
 });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const globalOverlay = document.getElementById('global-overlay');
+      let openWindowCount = 0;
+
+      // 使用事件委托处理所有打开按钮的点击事件
+      document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('custom-open-button')) {
+          const openButton = event.target;
+          const index = Array.from(document.querySelectorAll('.custom-open-button')).indexOf(openButton);
+          const windowElement = document.querySelectorAll('.custom-advanced-window')[index];
+
+          windowElement.classList.remove('collapsed');
+          openWindowCount++;
+          globalOverlay.style.display = 'block';
+        }
+
+        // 处理所有关闭按钮的点击事件
+        if (event.target.classList.contains('custom-close-button')) {
+          const closeButton = event.target;
+          const windowElement = closeButton.closest('.custom-advanced-window');
+
+          windowElement.classList.add('collapsed');
+          openWindowCount--;
+          if (openWindowCount <= 0) {
+            openWindowCount = 0;
+            setTimeout(() => {
+              globalOverlay.style.display = 'none';
+            }, 500);
+          }
+        }
+      });
+    });
